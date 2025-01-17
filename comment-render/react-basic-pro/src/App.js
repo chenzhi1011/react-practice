@@ -1,6 +1,9 @@
+import { use } from 'react';
 import './App.scss'
 import avatar from './images/bozai.png'
 import React, { useState } from "react";
+import _ from 'lodash'
+// import classNames from 'react';
 /**
  * 评论列表的渲染和操作
  *
@@ -73,15 +76,31 @@ const tabs = [
   { type: 'time', text: '最新' },
 ]
 
+
+
+
 //渲染评论列表
 
 const App = () => {
+  const [tabType,setTabType] =useState('hot')
+  const ChangeByTab =(type) =>{
+  console.log(type)
+  setTabType(type)
+  if (type === 'hot') {
+    // 根据点赞数量排序 
+    // lodash
+    setCommentList(_.orderBy(commentList, 'like', 'desc'))
+  } else {
+    // 根据创建时间排序
+    setCommentList(_.orderBy(commentList, 'ctime', 'desc'))
+  }}
+
   //1.用useState维护list
-  const [commentList, setComment] = useState(defaultList)
+  const [commentList, setCommentList] = useState(defaultList)
   const handleDel=(id)=>{
     console.log(id)
     //对list做过滤
-    setComment(commentList.filter(item=>item.rpid !== id))
+    setCommentList(commentList.filter(item=>item.rpid !== id))
   }
   return (
     <div className="app">
@@ -95,8 +114,11 @@ const App = () => {
           </li>
           <li className="nav-sort">
             {/* 高亮类名： active */}
-            <span className='nav-item'>最新</span>
-            <span className='nav-item'>最热</span>
+            {tabs.map(tab =>
+              <span className={`nav-item ${ tabType === tab.type && 'active'}`}
+              onClick={()=>ChangeByTab(tab.type)}
+              >{tab.text}</span>
+            )}
           </li>
         </ul>
       </div>
